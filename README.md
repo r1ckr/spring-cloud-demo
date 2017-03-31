@@ -1,19 +1,19 @@
-#Spring Cloud Demo
+# Spring Cloud Demo
 
-##Components:
-###Config Server:
+## Components:
+### Config Server:
 This one is an independent component which reads from Git and provides configurations to the components registering with it
 
-###Eureka Service
+### Eureka Service
 This another independent component providing service discovery where all the components will be registering, even himself
 
-###Reservation Service
+### Reservation Service
 This is the backend demo service which consumes the Config Server, registers with eureka, etc
 
-###Reservation Client
+### Reservation Client
 An edge service which connects to Reservation Service, circuit breaking, etc
 
-##Installation
+## Installation
 1. Run an istallation of RabbitMQ
     cd <rabitMQ files>/sbin
     ./rabbitmq-server
@@ -41,8 +41,8 @@ An edge service which connects to Reservation Service, circuit breaking, etc
     When running this one we will have full 
 
 
-##Sprign Cloud Features:
-###Proxying
+## Sprign Cloud Features:
+### Proxying
 This feature can be used on the services that sits on the edge of the Datacenter, in this case reservation-client
 
 Add to Application.class of reservation-client
@@ -54,9 +54,9 @@ http://localhost:8050/reservation-service/reservations
 What is happening is that reservation-client will go to eureka and look for a service called reservation-service and it will call to the resource /reservations
 
 
-###Messaging for writes:
+### Messaging for writes:
 Here reservation-client can be configured to talk to reservation-service through messages for writes, the way it has to be configured is:
-####Reservation Client:
+#### Reservation Client:
 reservation-client.properties:
     spring.cloud.stream.bindings.output.destination=reservations
 Reservation Client Application.class:
@@ -71,14 +71,14 @@ Controller:
         this.messageChannel.send(MessageBuilder.withPayload(reservation.getReservationName()).build());
     }
 
-####Reservation Service
+#### Reservation Service
 reservation-service.properties
     spring.cloud.stream.bindings.input.destination=reservations
 Reservation Service Application.class:
     @EnableBinding(Sink.class)
 Create class MessageReservationReceiver
 
-###Cloud Bus
+### Cloud Bus
 This is the way configurations will be updated from the config-server to all the clients consuming it
 
 We would need in every component a new dependency:
@@ -119,15 +119,15 @@ Application.class:
 With that we can start that component and access to the dashboard:
 http://localhost:8010/hystrix.html
 
-####Single
+#### Single
 To visualize a single instance we just need to paste the url of the host we want to monitor, eg:
 localhost:8050/hystrix.stream
 
-####Cluster
+#### Cluster
 
 
 
-###Tracing
+### Tracing
 This is a distributed tracing system and it's done with Zipkin https://github.com/openzipkin/zipkin
 
 Basically every component will be sending a trace to zipkin and a header to the next, by that way we can have a visual representation of every call. This is done adding:
@@ -155,3 +155,8 @@ java -jar zipkin.jar
 Now we can access the web interface and check the traces:
 http://http://localhost:9411/
 
+# References:
+https://spring.io/blog/2014/06/03/introducing-spring-cloud
+https://spring.io/blog/2015/01/20/microservice-registration-and-discovery-with-spring-cloud-and-netflix-s-eureka
+http://cloud.spring.io/spring-cloud-config/spring-cloud-config.html
+https://www.youtube.com/watch?v=hV5TTSiFhRs
